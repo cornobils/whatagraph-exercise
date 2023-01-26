@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\DataProviders\LocationDataProviderInterface;
+use App\DataProviders\MarketingDataProviderInterface;
+use App\DataProviders\WeatherDataProviderInterface;
 use App\DTO\Location;
 use Illuminate\Console\Command;
 
@@ -25,20 +27,24 @@ class WeatherCommand extends Command
      */
     protected $description = 'receives weather data and submits to Whatagraph';
 
-    /**
-     * @var LocationDataProviderInterface
-     */
     private $locationDataProvider;
+    private WeatherDataProviderInterface $weatherDataProvider;
+    private MarketingDataProviderInterface $marketingDataProvider;
 
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(LocationDataProviderInterface $locationDataProvider)
-    {
+    public function __construct(
+        LocationDataProviderInterface $locationDataProvider,
+        WeatherDataProviderInterface $weatherDataProvider,
+        MarketingDataProviderInterface $marketingDataProvider
+    ) {
         parent::__construct();
         $this->locationDataProvider = $locationDataProvider;
+        $this->weatherDataProvider = $weatherDataProvider;
+        $this->marketingDataProvider = $marketingDataProvider;
     }
 
     /**
@@ -58,6 +64,10 @@ class WeatherCommand extends Command
             true
         );
         $selectedLocations = $this->resolveLocationsByIds($selectedLocationIds, $locations);
+        foreach ($selectedLocations as $selectedLocation) {
+            $weatherData = $this->weatherDataProvider->getWeather($selectedLocation);
+            $this->marketingDataProvider->sendData($weatherData);
+        }
 
         return 0;
     }
