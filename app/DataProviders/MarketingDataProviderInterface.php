@@ -2,7 +2,12 @@
 
 namespace App\DataProviders;
 
+use App\DTO\MarketingRequest;
+
 interface MarketingDataProviderInterface
 {
-    public function sendData($data);
+    /**
+     * @param MarketingRequest[] $marketingRequests
+     */
+    public function sendData(array $marketingRequests);
 }

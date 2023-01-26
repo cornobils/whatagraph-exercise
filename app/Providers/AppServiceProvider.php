@@ -7,7 +7,7 @@ use App\DataProviders\LocationDataProviderInterface;
 use App\DataProviders\MarketingDataProviderInterface;
 use App\DataProviders\OneCallDataProviderInterface;
 use App\DataProviders\WeatherDataProviderInterface;
-use App\DataProviders\WhatagraphDataProviderInterface;
+use App\DataProviders\WhatagraphDataProvider;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(LocationDataProviderInterface::class, GeocodingDataProvider::class);
         $this->app->singleton(WeatherDataProviderInterface::class, OneCallDataProviderInterface::class);
-        $this->app->singleton(MarketingDataProviderInterface::class, WhatagraphDataProviderInterface::class);
+        $this->app->singleton(MarketingDataProviderInterface::class, WhatagraphDataProvider::class);
     }
 
     /**

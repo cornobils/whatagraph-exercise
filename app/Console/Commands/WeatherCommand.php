@@ -8,6 +8,7 @@ use App\DataProviders\LocationDataProviderInterface;
 use App\DataProviders\MarketingDataProviderInterface;
 use App\DataProviders\WeatherDataProviderInterface;
 use App\DTO\Location;
+use App\DTO\MarketingRequest;
 use Illuminate\Console\Command;
 
 class WeatherCommand extends Command
@@ -64,10 +65,13 @@ class WeatherCommand extends Command
             true
         );
         $selectedLocations = $this->resolveLocationsByIds($selectedLocationIds, $locations);
+        $marketingDatas = [];
         foreach ($selectedLocations as $selectedLocation) {
-            $weatherData = $this->weatherDataProvider->getWeather($selectedLocation);
-            $this->marketingDataProvider->sendData($weatherData);
+            $marketingDatas[] = $this->weatherDataProvider->getWeather($selectedLocation);
         }
+        $sentData = $this->marketingDataProvider->sendData($marketingDatas);
+        $this->info('Data has been sent successfully');
+        dump($sentData);
 
         return 0;
     }
