@@ -6,10 +6,18 @@ namespace App\DTO;
 
 final class Location
 {
+    private string $id;
     private string $name;
     private string $country;
     private float $lat;
     private float $lon;
+
+    public function __construct(int $key, string $name, string $country)
+    {
+        $this->setName($name);
+        $this->setCountry($country);
+        $this->setId(sprintf("%s %s (%s)", $key, $this->getName(), $this->getCountry()));
+    }
 
     /**
      * @return string
@@ -73,5 +81,21 @@ final class Location
     public function setCountry(string $country): void
     {
         $this->country = $country;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param string $id
+     */
+    public function setId(string $id): void
+    {
+        $this->id = $id;
     }
 }

@@ -16,8 +16,12 @@ final class GeocodingDataProvider implements LocationDataProviderInterface
         $url = $this->getUrl($location);
         $response = Http::get($url);
         $body = $response->json();
+        $result = [];
+        foreach ($body as $key => $locationResponse) {
+            $result[] = $this->createLocation($locationResponse, $key);
+        }
 
-        return array_map([$this, 'createLocation'], $body);
+        return $result;
     }
 
     public function getUrl(string $location): string
@@ -31,11 +35,9 @@ final class GeocodingDataProvider implements LocationDataProviderInterface
         return self::BASE_URL . '?' . $queryParams;
     }
 
-    private function createLocation(array $locationResponse): Location
+    private function createLocation(array $locationResponse, $key): Location
     {
-        $location = new Location();
-        $location->setName($locationResponse['name']);
-        $location->setCountry($locationResponse['country']);
+        $location = new Location($key, $locationResponse['name'], $locationResponse['country']);
         $location->setLat($locationResponse['lat']);
         $location->setLon($locationResponse['lon']);
 
