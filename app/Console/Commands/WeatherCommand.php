@@ -28,7 +28,7 @@ class WeatherCommand extends Command
      */
     protected $description = 'receives weather data and submits to Whatagraph';
 
-    private $locationDataProvider;
+    private LocationDataProviderInterface $locationDataProvider;
     private WeatherDataProviderInterface $weatherDataProvider;
     private MarketingDataProviderInterface $marketingDataProvider;
 
@@ -55,6 +55,21 @@ class WeatherCommand extends Command
      */
     public function handle()
     {
+        $locations = $this->getLocations();
+        $marketingRequests = $this->getMarketingRequests($locations);
+        $sentData = $this->marketingDataProvider->sendData($marketingRequests);
+
+        $this->info('Data has been sent successfully');
+        $this->info(json_encode($sentData));
+
+        return 0;
+    }
+
+    /**
+     * @return Location[]
+     */
+    private function getLocations(): array
+    {
         $locationString = $this->ask('Location name:');
         $locations = $this->locationDataProvider->getLocation($locationString);
         $selectedLocationIds = $this->choice(
@@ -64,16 +79,19 @@ class WeatherCommand extends Command
             null,
             true
         );
-        $selectedLocations = $this->resolveLocationsByIds($selectedLocationIds, $locations);
-        $marketingDatas = [];
-        foreach ($selectedLocations as $selectedLocation) {
-            $marketingDatas[] = $this->weatherDataProvider->getWeather($selectedLocation);
-        }
-        $sentData = $this->marketingDataProvider->sendData($marketingDatas);
-        $this->info('Data has been sent successfully');
-        dump($sentData);
 
-        return 0;
+        return $this->resolveLocationsByIds($selectedLocationIds, $locations);
+    }
+
+    /**
+     * @param Location[] $locations
+     * @return MarketingRequest[]
+     */
+    private function getMarketingRequests(array $locations): array
+    {
+        return array_map(function (Location $location) {
+            return $this->weatherDataProvider->getWeather($location);
+        }, $locations);
     }
 
     private function createChoices(array $locations): array

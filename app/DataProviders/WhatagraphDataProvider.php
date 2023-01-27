@@ -1,12 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataProviders;
 
 use App\DTO\MarketingRequest;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Http;
 
 final class WhatagraphDataProvider implements MarketingDataProviderInterface
 {
@@ -21,13 +21,17 @@ final class WhatagraphDataProvider implements MarketingDataProviderInterface
             ]
         );
         $weatherData = $this->createWeatherData($marketingRequests);
+        $apiKey = env('WHATAGRAPH_API_KEY');
+        if ($apiKey === null) {
+            throw new \InvalidArgumentException('WHATAGRAPH_API_KEY env parameter is empty. It will cause unexpected 500 error');
+        }
         $client->request(
             'POST',
             self::PATH,
             [
                 'headers' => [
                     'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer '.env('WHATAGRAPH_API_KEY'),
+                    'Authorization' => 'Bearer '. $apiKey,
                 ],
                 'json' => [
                     'data' => $weatherData,

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataProviders;
 
 use App\DTO\Location;
 use App\DTO\MarketingRequest;
 use Illuminate\Support\Facades\Http;
 
-final class OneCallDataProviderInterface implements WeatherDataProviderInterface
+final class OneCallDataProvider implements WeatherDataProviderInterface
 {
     public const BASE_URL = 'http://api.openweathermap.org/data/3.0/onecall';
 
@@ -14,6 +16,7 @@ final class OneCallDataProviderInterface implements WeatherDataProviderInterface
     {
         $url = $this->getUrl($location->getLat(), $location->getLon());
         $response = Http::get($url);
+        $response->throw();
         $body = $response->json();
 
         return $this->createMarketingRequest($body, $location);

@@ -16,14 +16,6 @@ final class MarketingRequest
     }
 
     /**
-     * @param float $temp
-     */
-    public function setTemp(float $temp): void
-    {
-        $this->temp = $temp;
-    }
-
-    /**
      * @return string
      */
     public function getLocation(): string
@@ -32,10 +24,24 @@ final class MarketingRequest
     }
 
     /**
-     * @param string $location
+     * @param float $temp
+     * @return MarketingRequest
      */
-    public function setLocation(string $location): void
+    public function setTemp(float $temp): MarketingRequest
+    {
+        $this->temp = $temp;
+
+        return $this;
+    }
+
+    /**
+     * @param string $location
+     * @return MarketingRequest
+     */
+    public function setLocation(string $location): MarketingRequest
     {
         $this->location = $location;
+
+        return $this;
     }
 }

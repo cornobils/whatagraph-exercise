@@ -15,8 +15,12 @@ final class GeocodingDataProvider implements LocationDataProviderInterface
     {
         $url = $this->getUrl($location);
         $response = Http::get($url);
+        $response->throw();
         $body = $response->json();
         $result = [];
+        if (count($body) === 0) {
+            throw new \InvalidArgumentException('No locations found.');
+        }
         foreach ($body as $key => $locationResponse) {
             $result[] = $this->createLocation($locationResponse, $key);
         }
@@ -24,7 +28,7 @@ final class GeocodingDataProvider implements LocationDataProviderInterface
         return $result;
     }
 
-    public function getUrl(string $location): string
+    private function getUrl(string $location): string
     {
         $queryParams = http_build_query([
             'q' => $location,
